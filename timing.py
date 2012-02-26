@@ -2,43 +2,8 @@ import core
 import timeit
 import random
 import sys
-import operator
 import argparse
-import os
-import re
-
-
-def build_timing_list(filename,
-                      class_count=50,
-                      class_size=1000,  
-                      list_count_per_class=10,
-                      large_list_sizes = (100, 1000),
-                      small_list_sizes = (0, 100),
-                      large_list_probability = 0.5):
-
-  large_list_sizes = list(range(*large_list_sizes))
-  small_list_sizes = list(range(*small_list_sizes))
-  with open(filename, "w") as f:
-    lists = []
-    classes = [list(range(class_size*i, class_size*(i+1))) for i in range(class_count)]
-    for c in classes:
-      # distribute each class across ~300 lists
-      for i in range(list_count_per_class):
-        lst = []
-        if random.random() < large_list_probability:
-          size = random.choice(large_list_sizes)
-        else:
-          size = random.choice(small_list_sizes)
-        nums = set(c)
-        for j in range(size):
-          x = random.choice(list(nums))
-          lst.append(x)
-          nums.remove(x)
-        random.shuffle(lst)
-        lists.append(lst)
-    random.shuffle(lists)
-    for lst in lists:
-      f.write(" ".join(str(x) for x in lst) + "\n")
+import time
 
 
 # =================
@@ -135,6 +100,43 @@ class Agf(Benchmark):
         self.setup += """\nlsts = {}""".format(repr(self.lsts))
 
 
+# ======================================
+# Function for building Nik's test lists
+# ======================================
+
+def build_timing_list(filename,
+                      class_count=50,
+                      class_size=1000,  
+                      list_count_per_class=10,
+                      large_list_sizes = (100, 1000),
+                      small_list_sizes = (0, 100),
+                      large_list_probability = 0.5):
+
+  large_list_sizes = list(range(*large_list_sizes))
+  small_list_sizes = list(range(*small_list_sizes))
+  with open(filename, "w") as f:
+    lists = []
+    classes = [list(range(class_size*i, class_size*(i+1))) for i in range(class_count)]
+    for c in classes:
+      # distribute each class across ~300 lists
+      for i in range(list_count_per_class):
+        lst = []
+        if random.random() < large_list_probability:
+          size = random.choice(large_list_sizes)
+        else:
+          size = random.choice(small_list_sizes)
+        nums = set(c)
+        for j in range(size):
+          x = random.choice(list(nums))
+          lst.append(x)
+          nums.remove(x)
+        random.shuffle(lst)
+        lists.append(lst)
+    random.shuffle(lists)
+    for lst in lists:
+      f.write(" ".join(str(x) for x in lst) + "\n")
+
+
 # ===============
 # Timing function
 # ===============
@@ -157,13 +159,19 @@ def timing(bench, number):
                                   number=number)
             except KeyboardInterrupt:
                 print(' skipped.')
+                try:
+                    time.sleep(0.2)
+                except KeyboardInterrupt:
+                    print('Two fast Ctrl-C - exiting')
+                    sys.exit(0)
+                
             else:
                 times.append((value.__doc__, t))
-                print(' --   {}   -- '.format(t))
+                print(' --   {:0.4f}   -- '.format(t))
 
     print('\nTiming Results:')
     for name,t in sorted(times, key=operator.itemgetter(1)):
-        print('{}  -- {}'.format(t,name))
+        print('{:0.3f}  -- {}'.format(t,name))
 
 
 if __name__ == '__main__':

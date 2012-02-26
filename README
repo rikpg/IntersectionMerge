@@ -2,7 +2,7 @@
 List merging based on intersections
 ===================================
 
-Summury of the answers from:
+Summary of the answers from:
 
 Python: simple list merging based on intersections
 http://stackoverflow.com/q/9110837/1132524
@@ -16,3 +16,24 @@ Credits
 =======
 
 All the credits to everyone from the links above.
+
+
+=====
+Usage
+=====
+
+All the merge functions are in `core.py`.
+
+To test all the functions:
+
+$ python3 test.py
+
+`lists/test_list.txt` is just random, I didn't give it much thought.
+
+To time all the functions:
+
+$ python3 timing.py
+
+- Ctrl-C to skip a test.
+- Two fast Ctrl-C to exit.
+
