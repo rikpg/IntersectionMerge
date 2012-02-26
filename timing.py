@@ -7,43 +7,28 @@ import argparse
 import os
 import re
 
-parser = argparse.ArgumentParser(description='Timing merge solutions.')
-list_file = parser.add_mutually_exclusive_group()
-list_file.add_argument('--new', action='store_true',
-                       help='build a new test list for Niklas timing test')
-list_file.add_argument('-f', '--filename',
-                       help='use this file for Niklas timing test')
 
-args = parser.parse_args()
+def build_timing_list(filename,
+                      class_count=50,
+                      class_size=1000,  
+                      list_count_per_class=10,
+                      large_list_sizes = (100, 1000),
+                      small_list_sizes = (0, 100),
+                      large_list_probability = 0.5):
 
-# (this part is ugly I know)
-if args.filename is not None:
-    FILENAME = args.filename    # if args.new FILENAME will be modified
-else:
-    filename = './lists/nik_test0.txt'
-    files = os.listdir('./lists')
-    for f in sorted(files):
-        if f.startswith('nik_test'):
-            filename = os.path.join('./lists/', f)
-    FILENAME = filename
-
-if args.new:
-  print('building test list (for Nik test) ... ', end='')
-  sys.stdout.flush()
-  FILENAME = re.sub(r'\d', lambda x: str(int(x.group()) + 1) , FILENAME)
-
-  with open(FILENAME, 'w') as f:
-
+  large_list_sizes = list(range(*large_list_sizes))
+  small_list_sizes = list(range(*small_list_sizes))
+  with open(filename, "w") as f:
     lists = []
-    classes = [range(1000*i, 1000*(i+1)) for i in range(15)]
+    classes = [list(range(class_size*i, class_size*(i+1))) for i in range(class_count)]
     for c in classes:
       # distribute each class across ~300 lists
-      for i in range(300):
+      for i in range(list_count_per_class):
         lst = []
-        if random.random() > 0.9:
-          size = random.randint(100, 1000);
+        if random.random() < large_list_probability:
+          size = random.choice(large_list_sizes)
         else:
-          size = random.randint(0, 50);
+          size = random.choice(small_list_sizes)
         nums = set(c)
         for j in range(size):
           x = random.choice(list(nums))
@@ -54,8 +39,6 @@ if args.new:
     random.shuffle(lists)
     for lst in lists:
       f.write(" ".join(str(x) for x in lst) + "\n")
-
-  print('done')
 
 
 # =================
@@ -95,16 +78,20 @@ class Benchmark:
 
 class Niklas(Benchmark):
 
+    def __init__(self, filename):
+        self.filename = filename
+        super().__init__()
+
     def load(self):
         self.lsts = []
-        with open(FILENAME, "r") as f:
+        with open(self.filename, "r") as f:
             for line in f:
                 lst = [int(x) for x in line.split()]
                 self.lsts.append(lst)
 
     def build_info(self):
         super().build_info()
-        self.info += '\n(from file: {}'.format(FILENAME)
+        self.info += '\n(from file: {})'.format(self.filename)
 
     def extend_setup(self):
         self.setup += """
@@ -119,7 +106,8 @@ for line in open("{0}", "r"):
   if len(lst) > max: max = len(lst)
   num += 1
   lsts.append(lst)
-""".format(FILENAME)
+""".format(self.filename)
+
 
 class Sven(Benchmark):
 
@@ -179,6 +167,45 @@ def timing(bench, number):
 
 
 if __name__ == '__main__':
-    timing(Niklas(), number=3)
-    timing(Sven(), number=1000)
+    parser = argparse.ArgumentParser(description='Timing merge solutions.')
+    list_file = parser.add_mutually_exclusive_group()
+    list_file.add_argument('--new', action='store_true',
+                           help='build a new test list')
+    args = parser.parse_args()
+
+    if args.new:
+        print('building test list (for Nik test) ... ', end='')
+        sys.stdout.flush()
+        param = dict(class_count = 50,
+                     class_size = 1000,
+                     list_count_per_class = 100,
+                     large_list_sizes = (100, 1000),
+                     small_list_sizes = (0, 100),
+                     large_list_probability = 0.5,
+                     filename = './lists/timing_1.txt')
+        build_timing_list(**param)
+
+        param = dict(class_count = 15,
+                     class_size = 1000,
+                     list_count_per_class = 300,
+                     large_list_sizes = (100, 1000),
+                     small_list_sizes = (0, 100),
+                     large_list_probability = 0.5,
+                     filename = './lists/timing_2.txt')
+        build_timing_list(**param)
+        
+        param = dict(class_count = 15,
+                     class_size = 1000,
+                     list_count_per_class = 300,
+                     large_list_sizes = (100, 1000),
+                     small_list_sizes = (0, 100),
+                     large_list_probability = 0.1,
+                     filename = './lists/timing_3.txt')
+        build_timing_list(**param)
+        print('done')
+        
+    timing(Niklas('./lists/timing_1.txt'), number=3)
+    timing(Niklas('./lists/timing_2.txt'), number=3)
+    timing(Niklas('./lists/timing_3.txt'), number=3)
+    timing(Sven(), number=500)
     timing(Agf(), number=10)

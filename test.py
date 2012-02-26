@@ -9,7 +9,7 @@ class MergeTestCase(unittest.TestCase):
     def setUp(self):
         with open('./lists/test_list.txt') as f:
             self.lsts = json.loads(f.read())
-        self.merged = self.merge_func(deepcopy(self.lsts)
+        self.merged = self.merge_func(deepcopy(self.lsts))
 
     def test_disjoint(self):
         """Check disjoint-ness of merged results"""
@@ -49,6 +49,6 @@ if __name__ == '__main__':
             Custom_TestCase = get_TestCase(value)
             suite = unittest.TestLoader().loadTestsFromTestCase(Custom_TestCase)
             unittest.TextTestRunner(verbosity=2).run(suite)
-            #input('Press Enter to continue')
+            input('Press Enter to continue')
 
 
