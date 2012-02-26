@@ -22,13 +22,21 @@ All the credits to everyone from the links above.
 Usage
 =====
 
-All the merge functions are in `core.py`.
+All the merge functions are in core.py.
+
+To add a new function:
+
+ - place the code in core.py
+ - the name must end with '_merge'
+ - and it needs a docstring like the others.
+
+After that it will auto loaded and everything will be taken care fo on its own.
 
 To test all the functions:
 
 $ python3 test.py
 
-`lists/test_list.txt` is just random, I didn't give it much thought.
+lists/test_list.txt is just random, I didn't give it much thought.
 
 To time all the functions:
 

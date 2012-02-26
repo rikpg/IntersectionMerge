@@ -1,7 +1,14 @@
+#
+# Module with all the merging functions
+#
+# Evey function with a name ending with '_merge' will be auto loaded
+
+
 import networkx
 import heapq
 from itertools import chain
 from collections import deque
+import operator
 
 
 def rik_merge(lsts):
@@ -238,5 +245,22 @@ def ale_merge(data):
     return have
 
 
-
-
+def nik_rew_merge_skip(lsts):
+    """Nik's rewrite"""
+    sets = list(map(set,lsts))
+    results = []
+    while sets:
+        first, rest = sets[0], sets[1:]
+        merged = False
+        sets = []
+        for s in rest:
+            if s and s.isdisjoint(first):
+                sets.append(s)
+            else:
+                first |= s
+                merged = True
+        if merged:
+            sets.append(first)
+        else:
+            results.append(first)
+    return results
