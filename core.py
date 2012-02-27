@@ -38,14 +38,15 @@ def sve_merge(lsts):
     sets = {}
     for lst in lsts:
         s = set(lst)
-        for x in set(lst):
+        t = set()
+        for x in s:
             if x in sets:
-                t = sets[x]
-                for y in t:
-                    sets[y] = s
-                s.update(t)
+                t.update(sets[x])
             else:
                 sets[x] = s
+        for y in t:
+            sets[y] = s
+        s.update(t)
     ids = set()
     result = []
     for s in sets.values():
@@ -55,10 +56,10 @@ def sve_merge(lsts):
     return result
 
 
-def hoc_merge(lsts):
+def hoc_merge(lsts):    # modified a bit to make it return sets
     """hochl"""
-    s = list(map(set, lsts))
-    i, n=0, len(s)
+    s = [set(lst) for lst in lsts if lst]
+    i,n = 0,len(s)
     while i < n-1:
         for j in range(i+1, n):
             if s[i].intersection(s[j]):
@@ -66,9 +67,9 @@ def hoc_merge(lsts):
                 del s[j]
                 n -= 1
                 break
-            else:
-                i += 1
-    return [sorted(i) for i in s]
+        else:
+            i += 1
+    return [set(i) for i in s]
 
 
 def nik_merge(lsts):
