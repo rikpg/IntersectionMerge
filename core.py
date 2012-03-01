@@ -8,7 +8,6 @@ import networkx
 import heapq
 from itertools import chain
 from collections import deque
-import operator
 
 
 def rik_merge(lsts):

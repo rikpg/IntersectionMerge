@@ -4,7 +4,6 @@ import random
 import sys
 import argparse
 import time
-import operator
 
 
 # =================
@@ -167,11 +166,11 @@ def timing(bench, number):
                     sys.exit(0)
                 
             else:
-                times.append((value.__doc__, t))
+                times.append((t, value.__doc__))
                 print(' --   {:0.4f}   -- '.format(t))
 
     print('\nTiming Results:')
-    for name,t in sorted(times, key=operator.itemgetter(1)):
+    for t,name in sorted(times):
         print('{:0.3f}  -- {}'.format(t,name))
 
 

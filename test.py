@@ -45,7 +45,7 @@ def get_TestCase(merge_function):
 if __name__ == '__main__':
     for name,value in vars(core).items():
         if name.endswith('_merge'):
-            print('\n  -- Going to test: {} --\n'.format(value.__doc__))
+            print('\n### Going to test: {} ###\n'.format(value.__doc__))
             Custom_TestCase = get_TestCase(value)
             suite = unittest.TestLoader().loadTestsFromTestCase(Custom_TestCase)
             unittest.TextTestRunner(verbosity=2).run(suite)
