@@ -3,11 +3,12 @@
 #
 # Evey function with a name ending with '_merge' will be auto loaded
 
-
-import networkx
+from collections import deque
 import heapq
 from itertools import chain
-from collections import deque
+from typing import Iterable, Iterator, TypeVar
+
+import networkx
 
 
 def rik_merge(lsts):
@@ -266,3 +267,44 @@ def nik_rew_merge(lsts):
         else:
             results.append(first)
     return results
+
+
+T = TypeVar('T')
+
+
+def takeshi_merge(lists: Iterator[Iterable[T]]) -> list[set[T]]:
+    """takeshi"""
+    bins: dict[T: set[T]] = dict()
+    bin_refs: dict[T: T] = dict()
+    for lst in lists:
+        if not lst:
+            continue
+
+        # Gather the bin refs of all items in the list that we have
+        # already seen.
+        encountered_items_bin_refs = {
+            bin_refs[item]
+            for item in lst
+            if item in bin_refs
+        }
+        if len(encountered_items_bin_refs) >= 1:
+            # Some of the items in `lst` have already been seen in a
+            # previous iteration. They are therefore already attached
+            # to a bin. Select any of their corresponding bin ref.
+            bin_ref = encountered_items_bin_refs.pop()
+            # If the previously-seen items were not all attached to the
+            # same bin, their respective bins need to be merged into
+            # the selected one.
+            if len(encountered_items_bin_refs) > 0:
+                to_merge_bins = [bins.pop(ref) for ref in encountered_items_bin_refs]
+                bins[bin_ref].update(chain(*to_merge_bins))
+                bin_refs.update({item: bin_ref for item in chain(*to_merge_bins)})
+            bins[bin_ref].update(lst)
+        else:
+            # None of the items in `lst` have already been seen in a
+            # previous iteration. Therefore, we can safely pick any
+            # item as our new bin ref and create the corresponding bin.
+            bin_ref = next(iter(lst))
+            bins[bin_ref] = set(lst)
+        bin_refs.update({item: bin_ref for item in lst})
+    return list(bins.values())
