@@ -33,6 +33,13 @@ All the merge functions are in core.py.
 
 After that it will be auto loaded and everything will be taken care of on its own.
 
+Profile a function/list combo
+-----------------------------
+
+$ python3 profiler.py -f alexis -l timing_1
+
+This will open a snakeviz visualisation of the execution profile in your browser at the end.
+
 Test all the functions
 ----------------------
 
@@ -47,4 +54,3 @@ $ python3 timing.py
 
 - Ctrl-C to skip a test.
 - Two fast Ctrl-C to exit.
-
