@@ -17,7 +17,7 @@ class Benchmark:
     def __init__(self):
         self.lsts = []
         self.info = ''
-        self.setup = 'from copy import deepcopy\nlists = deepcopy(lsts)'
+        self.setup = 'lists = [[item for item in lst] for lst in lsts]'
         self.load()
         self.build_info()
 
