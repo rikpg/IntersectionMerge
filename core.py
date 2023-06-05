@@ -100,10 +100,13 @@ def pairs(lst):
         prev = item
     yield item, first
 
+
 def kat_merge(lsts):
     """katrielalex"""
     g = networkx.Graph()
     for sub_list in lsts:
+        if not sub_list:
+            continue
         for edge in pairs(sub_list):
             g.add_edge(*edge)
 
@@ -206,7 +209,6 @@ def che_merge(lsts):
 def locatebin(bins, n):
     """Find the bin where list n has ended up: Follow bin references until
     we find a bin that has not moved.
-    
     """
     while bins[n] != n:
         n = bins[n]
@@ -218,7 +220,7 @@ def ale_merge(data):
     bins = list(range(len(data)))  # Initialize each bin[n] == n
     nums = dict()
 
-    data = [set(m) for m in data ]  # Convert to sets    
+    data = [set(m) for m in data]  # Convert to sets
     for r, row in enumerate(data):
         for num in row:
             if num not in nums:
@@ -233,11 +235,11 @@ def ale_merge(data):
                 if dest > r:
                     dest, r = r, dest   # always merge into the smallest bin
 
-                data[dest].update(data[r]) 
+                data[dest].update(data[r])
                 data[r] = None
                 # Update our indices to reflect the move
                 bins[r] = dest
-                r = dest 
+                r = dest
 
     # Filter out the empty bins
     have = [ m for m in data if m ]
@@ -245,7 +247,7 @@ def ale_merge(data):
     return have
 
 
-def nik_rew_merge_skip(lsts):
+def nik_rew_merge(lsts):
     """Nik's rewrite"""
     sets = list(map(set,lsts))
     results = []

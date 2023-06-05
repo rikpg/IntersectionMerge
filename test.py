@@ -9,12 +9,12 @@ class MergeTestCase(unittest.TestCase):
     def setUp(self):
         with open('./lists/test_list.txt') as f:
             self.lsts = json.loads(f.read())
-        self.merged = self.merge_func(deepcopy(self.lsts))
+        self.merged = list(self.merge_func(deepcopy(self.lsts)))
 
     def test_disjoint(self):
         """Check disjoint-ness of merged results"""
         from itertools import combinations
-        for a,b in combinations(self.merged, 2):
+        for a, b in combinations(self.merged, 2):
             self.assertTrue(a.isdisjoint(b))
 
     def test_coverage(self):    # Credit to katrielalex
