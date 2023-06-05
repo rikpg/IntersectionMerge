@@ -186,7 +186,8 @@ def timing(bench, number):
     best_t, best_name = times[0]
     for t, name in times:
         factor = t / best_t
-        print(f'{t:0.3f} ({factor:.2g}x) -- {name}')
+        fmt = '.2g' if factor < 99 else '.0f'
+        print(f'{t:0.3f} ({factor:{fmt}}x) -- {name}')
 
 
 if __name__ == '__main__':

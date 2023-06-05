@@ -298,7 +298,8 @@ def takeshi_merge(lists: Iterator[Iterable[T]]) -> list[set[T]]:
             if len(encountered_items_bin_refs) > 0:
                 to_merge_bins = [bins.pop(ref) for ref in encountered_items_bin_refs]
                 bins[bin_ref].update(chain(*to_merge_bins))
-                bin_refs.update({item: bin_ref for item in chain(*to_merge_bins)})
+                for item in chain(*to_merge_bins):
+                    bin_refs[item] = bin_ref
             bins[bin_ref].update(lst)
         else:
             # None of the items in `lst` have already been seen in a
@@ -306,5 +307,6 @@ def takeshi_merge(lists: Iterator[Iterable[T]]) -> list[set[T]]:
             # item as our new bin ref and create the corresponding bin.
             bin_ref = next(iter(lst))
             bins[bin_ref] = set(lst)
-        bin_refs.update({item: bin_ref for item in lst})
+        for item in lst:
+            bin_refs[item] = bin_ref
     return list(bins.values())
