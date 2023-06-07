@@ -3,11 +3,12 @@
 #
 # Evey function with a name ending with '_merge' will be auto loaded
 
-
-import networkx
+from collections import deque
 import heapq
 from itertools import chain
-from collections import deque
+from typing import Iterable, TypeVar
+
+import networkx
 
 
 def rik_merge(lsts):
@@ -100,10 +101,13 @@ def pairs(lst):
         prev = item
     yield item, first
 
+
 def kat_merge(lsts):
     """katrielalex"""
     g = networkx.Graph()
     for sub_list in lsts:
+        if not sub_list:
+            continue
         for edge in pairs(sub_list):
             g.add_edge(*edge)
 
@@ -206,7 +210,6 @@ def che_merge(lsts):
 def locatebin(bins, n):
     """Find the bin where list n has ended up: Follow bin references until
     we find a bin that has not moved.
-    
     """
     while bins[n] != n:
         n = bins[n]
@@ -218,7 +221,7 @@ def ale_merge(data):
     bins = list(range(len(data)))  # Initialize each bin[n] == n
     nums = dict()
 
-    data = [set(m) for m in data ]  # Convert to sets    
+    data = [set(m) for m in data]  # Convert to sets
     for r, row in enumerate(data):
         for num in row:
             if num not in nums:
@@ -233,11 +236,11 @@ def ale_merge(data):
                 if dest > r:
                     dest, r = r, dest   # always merge into the smallest bin
 
-                data[dest].update(data[r]) 
+                data[dest].update(data[r])
                 data[r] = None
                 # Update our indices to reflect the move
                 bins[r] = dest
-                r = dest 
+                r = dest
 
     # Filter out the empty bins
     have = [ m for m in data if m ]
@@ -245,7 +248,7 @@ def ale_merge(data):
     return have
 
 
-def nik_rew_merge_skip(lsts):
+def nik_rew_merge(lsts):
     """Nik's rewrite"""
     sets = list(map(set,lsts))
     results = []
@@ -264,3 +267,46 @@ def nik_rew_merge_skip(lsts):
         else:
             results.append(first)
     return results
+
+
+T = TypeVar('T')
+
+
+def takeshi_merge(lists: Iterable[Iterable[T]]) -> list[set[T]]:
+    """takeshi"""
+    bins: dict[T: set[T]] = dict()
+    bin_refs: dict[T: T] = dict()
+    for lst in lists:
+        if not lst:
+            continue
+
+        # Gather the bin refs of all items in the list that we have
+        # already seen.
+        encountered_items_bin_refs = {
+            bin_refs[item]
+            for item in lst
+            if item in bin_refs
+        }
+        if len(encountered_items_bin_refs) >= 1:
+            # Some of the items in `lst` have already been seen in a
+            # previous iteration. They are therefore already attached
+            # to a bin. Select any of their corresponding bin ref.
+            bin_ref = encountered_items_bin_refs.pop()
+            # If the previously-seen items were not all attached to the
+            # same bin, their respective bins need to be merged into
+            # the selected one.
+            if len(encountered_items_bin_refs) > 0:
+                to_merge_bins = [bins.pop(ref) for ref in encountered_items_bin_refs]
+                bins[bin_ref].update(chain(*to_merge_bins))
+                for item in chain(*to_merge_bins):
+                    bin_refs[item] = bin_ref
+            bins[bin_ref].update(lst)
+        else:
+            # None of the items in `lst` have already been seen in a
+            # previous iteration. Therefore, we can safely pick any
+            # item as our new bin ref and create the corresponding bin.
+            bin_ref = next(iter(lst))
+            bins[bin_ref] = set(lst)
+        for item in lst:
+            bin_refs[item] = bin_ref
+    return list(bins.values())
