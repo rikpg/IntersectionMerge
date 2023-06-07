@@ -6,7 +6,7 @@
 from collections import deque
 import heapq
 from itertools import chain
-from typing import Iterable, Iterator, TypeVar
+from typing import Iterable, TypeVar
 
 import networkx
 
@@ -272,7 +272,7 @@ def nik_rew_merge(lsts):
 T = TypeVar('T')
 
 
-def takeshi_merge(lists: Iterator[Iterable[T]]) -> list[set[T]]:
+def takeshi_merge(lists: Iterable[Iterable[T]]) -> list[set[T]]:
     """takeshi"""
     bins: dict[T: set[T]] = dict()
     bin_refs: dict[T: T] = dict()
